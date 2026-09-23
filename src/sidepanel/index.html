@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="claude-inspector-project" content="incolla">
+  <title>Incolla</title>
+  <link rel="stylesheet" href="stile.css">
+</head>
+<body>
+  <header>
+    <h1>Incolla</h1>
+    <button id="svuota" class="piatto" title="Togli tutte le chip">Svuota</button>
+  </header>
+
+  <textarea id="incollaQui" rows="3"
+    placeholder="Incolla qui i dati, oppure seleziona il testo in una pagina e premi ⌘⇧Y"></textarea>
+
+  <p id="campo" class="campo"></p>
+  <p id="esito" class="esito" hidden></p>
+
+  <ul id="chip" class="chip"></ul>
+
+  <p id="vuoto" class="nota">
+    Nessuna chip. Incolla dei dati qui sopra: vengono spezzati e riconosciuti da soli.
+  </p>
+
+  <script type="module" src="index.ts"></script>
+</body>
+</html>

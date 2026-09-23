@@ -1,0 +1,46 @@
+:root { color-scheme: light dark; --bordo: color-mix(in srgb, currentColor 18%, transparent); }
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 12px;
+  font: 13px/1.45 ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
+header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
+h1 { font-size: 14px; margin: 0; }
+.piatto {
+  font: inherit; font-size: 12px; background: none; border: 1px solid var(--bordo);
+  border-radius: 5px; padding: 2px 8px; cursor: pointer; color: inherit; opacity: .8;
+}
+.piatto:hover { opacity: 1; }
+textarea {
+  width: 100%; font: inherit; padding: 7px; border-radius: 6px;
+  border: 1px solid var(--bordo); background: transparent; color: inherit; resize: vertical;
+}
+.campo { margin: 10px 0 4px; font-size: 12px; opacity: .75; min-height: 1.4em; }
+.campo b { opacity: 1; font-weight: 600; }
+.esito { margin: 0 0 8px; font-size: 12px; padding: 5px 8px; border-radius: 5px; }
+.esito.ok { background: color-mix(in srgb, #1a7f37 15%, transparent); }
+.esito.ko { background: color-mix(in srgb, #cf222e 15%, transparent); }
+.nota { opacity: .6; font-size: 12px; }
+
+.chip { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 5px; }
+.chip li {
+  display: flex; align-items: center; gap: 8px;
+  border: 1px solid var(--bordo); border-radius: 7px; padding: 6px 8px;
+}
+.chip li:hover { background: color-mix(in srgb, currentColor 5%, transparent); }
+.chip .met { min-width: 0; flex: 1; }
+.chip .et { font-size: 11px; opacity: .65; display: block; }
+.chip .va {
+  font-family: ui-monospace, SFMono-Regular, monospace; font-size: 12px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;
+}
+.chip .usa { font: inherit; font-size: 12px; cursor: pointer; border: none;
+  background: color-mix(in srgb, currentColor 10%, transparent); color: inherit;
+  border-radius: 5px; padding: 4px 10px; }
+.chip .usa:hover { background: color-mix(in srgb, currentColor 20%, transparent); }
+.chip .via { background: none; border: none; cursor: pointer; color: inherit; opacity: .45;
+  font-size: 15px; line-height: 1; padding: 0 2px; }
+.chip .via:hover { opacity: 1; }
+/* un valore di cui non ci fidiamo lo si dice, non lo si nasconde */
+.chip li.incerta { border-style: dashed; }
+.chip li.incerta .et::after { content: ' · da controllare'; opacity: .8; }

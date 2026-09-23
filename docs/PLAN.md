@@ -69,12 +69,11 @@ che a farle passare sono i permessi, non una CORS permissiva dell'altro capo.
 > non sul Chrome di sistema. Da confermare quando si scrive T5 — se non reggesse, il
 > riempimento si collauda a mano sulle tre fixture e la copertura e2e si ridimensiona.
 
-### F1 — v0 senza AI
+### F1 — v0 senza AI ✅ **codice completo il 2026-09-23** (resta il collaudo sul campo)
 
 Da qui in poi il codice si tiene. Due binari indipendenti, si incontrano in T7.
 
-- [~] **T1 — Scheletro MV3** — fatta la parte senza Vite (package/tsconfig/vitest, test verdi);
-      manifest + side panel + `pnpm dev` restano da fare
+- [x] **T1 — Scheletro MV3** ✅ 2026-09-23 (Vite + @crxjs, manifest, side panel, `pnpm build` verde)
 
   - Acceptance: `pnpm dev`, l'estensione si carica, il pannello si apre.
   - Verify: `pnpm build` verde + caricamento a mano in Chrome.
@@ -106,19 +105,19 @@ Da qui in poi il codice si tiene. Due binari indipendenti, si incontrano in T7.
   - Verify: `pnpm test:e2e`.
   - Files: `src/fill/riempi.ts`, `src/content/index.ts` + test e2e
 
-- [ ] **T6 — Campo attivo** (il content script sa qual è l'ultimo campo toccato)
+- [x] **T6 — Campo attivo** ✅ 2026-09-23 (il content script sa qual è l'ultimo campo toccato)
   - Insidia: cliccare una chip nel pannello **non** deve far perdere il fuoco al campo.
   - Acceptance: clicco un campo, clicco una chip, il valore va in quel campo.
   - Verify: e2e sulle tre fixture.
   - Files: `src/content/campo-attivo.ts` + test
 
-- [ ] **T7 — Stato nel service worker** (le chip sopravvivono al cambio tab — deciso)
+- [x] **T7 — Stato nel service worker** ✅ 2026-09-23 (le chip sopravvivono al cambio tab — deciso)
   - Acceptance: chip create su un tab, il pannello le mostra ancora dopo essere passati
     a un altro tab e tornati.
   - Verify: e2e con due tab.
   - Files: `src/background/stato.ts`, `src/shared/messaggi.ts`
 
-- [ ] **T8 — Il pannello** (lista chip, editing di etichetta e valore, click per riempire)
+- [x] **T8 — Il pannello** ✅ 2026-09-23 (lista chip, editing di etichetta e valore, click per riempire)
   - Acceptance: il giro completo funziona — seleziono testo, premo la scorciatoia, vedo le
     chip, clicco campo + chip, il valore entra.
   - Verify: a mano sulle tre fixture + e2e del giro completo.
