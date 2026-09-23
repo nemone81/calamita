@@ -99,7 +99,7 @@ Da qui in poi il codice si tiene. Due binari indipendenti, si incontrano in T7.
   - Verify: `pnpm test`, copertura di `extract/` sopra l'80%.
   - Files: `src/extract/patterns.ts`, `src/extract/validate.ts` + test
 
-- [ ] **T5 — Riempimento robusto** (native setter + `input`/`change` con `bubbles`)
+- [x] **T5 — Riempimento robusto** ✅ 2026-09-23 (native setter + `input`/`change` con `bubbles`)
   - È il pezzo tecnicamente più insidioso del progetto: React è il caso che rompe
     l'assegnazione ingenua di `.value`.
   - Acceptance: riempie su tutte e tre le fixture, **verificato dopo il blur**.
