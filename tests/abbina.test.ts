@@ -151,3 +151,29 @@ describe('le parole generiche non bastano ad abbinare', () => {
     expect(abbina(s, c)).toEqual([])
   })
 })
+
+describe('due chip dello stesso concetto si distinguono per il resto dell\'etichetta', () => {
+  // senza questo, "Comune di nascita" e "Comune di residenza" valgono uguale
+  // e l'assegnazione diventa un sorteggio
+  it('nascita e residenza non si scambiano', () => {
+    const s = [chip('Comune di nascita', 'Roma'), chip('Comune di residenza', 'Milano')]
+    const c = [campo(0, { etichetta: 'Luogo di nascita' }), campo(1, { etichetta: 'Citta di residenza' })]
+    const m = mappa(abbina(s, c))
+    expect(m[s[0]!.id]).toBe(0)
+    expect(m[s[1]!.id]).toBe(1)
+  })
+
+  it('sede legale e sede operativa non si scambiano', () => {
+    const s = [chip('Sede legale', 'VIA PO 20'), chip('Sede operativa', 'VIA MILANO 3')]
+    const c = [campo(0, { etichetta: 'Indirizzo sede operativa' }), campo(1, { etichetta: 'Indirizzo sede legale' })]
+    const m = mappa(abbina(s, c))
+    expect(m[s[0]!.id]).toBe(1)
+    expect(m[s[1]!.id]).toBe(0)
+  })
+
+  it('la parola che distingue finisce nel motivo, perché l\'utente possa smentirlo', () => {
+    const s = [chip('Comune di nascita', 'Roma')]
+    const c = [campo(0, { etichetta: 'Luogo di nascita' })]
+    expect(abbina(s, c)[0]!.motivo).toContain('nascita')
+  })
+})

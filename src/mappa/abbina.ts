@@ -89,9 +89,16 @@ function punteggia(s: Slot, c: Campo): { punteggio: number; motivo: string } {
     const nellaChip = concetto.parole.find((p) => contiene(etichettaChip, p))
     if (nelCampo && nellaChip) {
       const viaAutocomplete = concetto.autocomplete && c.autocomplete === concetto.autocomplete
+      // Il concetto da solo non basta quando due chip se lo contendono:
+      // "Comune di nascita" e "Comune di residenza" parlano entrambe di città.
+      // A distinguerle è ciò che resta dell'etichetta una volta tolto il concetto.
+      const dist = discriminanti(etichettaChip, testoCampo, concetto.parole)
+      const base = viaAutocomplete ? 0.95 : 0.85
       return {
-        punteggio: viaAutocomplete ? 0.95 : 0.85,
-        motivo: `entrambi parlano di “${concetto.chiave}”`,
+        punteggio: Math.min(0.99, base + dist.comuni * 0.06 - dist.contrarie * 0.25),
+        motivo: dist.parola
+          ? `entrambi parlano di “${concetto.chiave}”, e di “${dist.parola}”`
+          : `entrambi parlano di “${concetto.chiave}”`,
       }
     }
     // il campo dichiara il concetto via autocomplete e la chip lo nomina
@@ -125,6 +132,28 @@ function punteggia(s: Slot, c: Campo): { punteggio: number; motivo: string } {
   }
 
   return { punteggio: 0, motivo: '' }
+}
+
+/**
+ * Le parole che restano una volta tolto il concetto condiviso. Sono quelle che
+ * distinguono "Comune di nascita" da "Comune di residenza": senza guardarle, due
+ * chip dello stesso concetto valgono uguale e l'assegnazione diventa un sorteggio.
+ */
+function discriminanti(chip: string, campo: string, delConcetto: string[]) {
+  const togli = new Set(delConcetto.flatMap((p) => p.split(' ')))
+  const utili = (s: string) => new Set(
+    s.split(' ').filter((w) => w.length > 2 && !GENERICHE.has(w) && !togli.has(w)))
+
+  const a = utili(chip)
+  const b = utili(campo)
+  let comuni = 0
+  let parola: string | null = null
+  for (const w of a) if (b.has(w)) { comuni++; parola ??= w }
+
+  // parole presenti da una sola parte: indizio che le due etichette parlano
+  // della stessa cosa ma di due esemplari diversi
+  const contrarie = (comuni === 0 && a.size > 0 && b.size > 0) ? 1 : 0
+  return { comuni, contrarie, parola }
 }
 
 /** Confronto per parole intere: "cap" non deve pescare "capienza". */
