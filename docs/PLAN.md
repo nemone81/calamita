@@ -73,12 +73,14 @@ che a farle passare sono i permessi, non una CORS permissiva dell'altro capo.
 
 Da qui in poi il codice si tiene. Due binari indipendenti, si incontrano in T7.
 
-- [ ] **T1 — Scheletro MV3** (Vite + @crxjs, TS, manifest, side panel vuoto che si apre)
+- [~] **T1 — Scheletro MV3** — fatta la parte senza Vite (package/tsconfig/vitest, test verdi);
+      manifest + side panel + `pnpm dev` restano da fare
+
   - Acceptance: `pnpm dev`, l'estensione si carica, il pannello si apre.
   - Verify: `pnpm build` verde + caricamento a mano in Chrome.
   - Files: `manifest.config.ts`, `vite.config.ts`, `package.json`, `src/sidepanel/index.html`
 
-- [ ] **T2 — Le tre fixture** (`plain.html`, `react.html`, `legacy.html`)
+- [x] **T2 — Le tre fixture** ✅ 2026-09-23 (`plain.html`, `react.html`, `legacy.html`)
   - Sono il banco di prova di tutto il riempimento: vengono prima di ciò che testano.
   - Acceptance: tre pagine servite in locale, ognuna col suo tipo di trappola.
   - Verify: aperte a mano, si compilano a mano.
@@ -86,12 +88,12 @@ Da qui in poi il codice si tiene. Due binari indipendenti, si incontrano in T7.
 
 *Da qui T3-T4 e T5-T6 procedono in parallelo.*
 
-- [ ] **T3 — Segmentazione** (split righe/tab, parsing `Chiave: valore`)
+- [x] **T3 — Segmentazione** ✅ 2026-09-23 (split righe/tab, parsing `Chiave: valore`)
   - Acceptance: da un blob misto escono coppie etichetta/valore plausibili.
   - Verify: `pnpm test` — casi con tab, con `:`, con righe sporche.
   - Files: `src/extract/segment.ts` + test
 
-- [ ] **T4 — Pattern e checksum** (email, telefono, CAP, data, importo, CF, IBAN, P.IVA)
+- [x] **T4 — Pattern e checksum** ✅ 2026-09-23 (email, telefono, CAP, data, importo, CF, IBAN, P.IVA)
   - Acceptance: ogni pattern ha positivi, negativi e **un falso amico**; CF/IBAN/P.IVA
     validano il checksum e rifiutano una cifra alterata.
   - Verify: `pnpm test`, copertura di `extract/` sopra l'80%.
