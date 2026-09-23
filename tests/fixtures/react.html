@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="claude-inspector-project" content="incolla">
+<title>Fixture — input controllati React</title>
+<style>body{font:14px system-ui;max-width:32rem;margin:2rem auto}label{display:block;margin:.8rem 0 .2rem}input{width:100%;padding:.4rem}#spia{margin-top:1.5rem;padding:.6rem;background:#f4f4f4;font-family:ui-monospace,monospace;font-size:12px;white-space:pre-wrap}</style>
+</head>
+<body>
+<h1>Input controllati da React</h1>
+<p>La trappola: assegnare <code>.value</code> aggiorna il DOM ma non lo stato di React, che
+alla prima ri-renderizzazione rimette il valore vecchio. La spia qui sotto mostra lo
+<b>stato di React</b>, non il DOM: se il riempimento è fatto male, il campo sembra pieno e
+la spia resta vuota.</p>
+<div id="root"></div>
+<div id="spia">stato React: {}</div>
+
+<!-- vendorizzato: i test e2e non devono dipendere dalla rete -->
+<script src="vendor/react.js"></script>
+<script src="vendor/react-dom.js"></script>
+<script>
+const { useState, createElement: h } = React
+
+function Campo({ id, etichetta, valore, onChange }) {
+  return h('div', null,
+    h('label', { htmlFor: id }, etichetta),
+    h('input', { id, name: id, value: valore, onChange: (e) => onChange(e.target.value) }),
+  )
+}
+
+function Form() {
+  const [dati, setDati] = useState({ nome: '', email: '', cap: '', iban: '' })
+  const set = (k) => (v) => setDati((d) => {
+    const n = { ...d, [k]: v }
+    document.getElementById('spia').textContent = 'stato React: ' + JSON.stringify(n, null, 1)
+    return n
+  })
+  return h('form', { id: 'f' },
+    h(Campo, { id: 'nome',  etichetta: 'Nome',           valore: dati.nome,  onChange: set('nome') }),
+    h(Campo, { id: 'email', etichetta: 'Email',          valore: dati.email, onChange: set('email') }),
+    h(Campo, { id: 'cap',   etichetta: 'CAP',            valore: dati.cap,   onChange: set('cap') }),
+    h(Campo, { id: 'iban',  etichetta: 'IBAN',           valore: dati.iban,  onChange: set('iban') }),
+  )
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(h(Form))
+</script>
+</body>
+</html>
