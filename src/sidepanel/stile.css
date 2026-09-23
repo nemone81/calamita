@@ -44,3 +44,16 @@ textarea {
 /* un valore di cui non ci fidiamo lo si dice, non lo si nasconde */
 .chip li.incerta { border-style: dashed; }
 .chip li.incerta .et::after { content: ' · da controllare'; opacity: .8; }
+
+.azioni { display: flex; gap: 6px; margin-top: 8px; }
+.primario { font: inherit; font-size: 12px; border: 1px solid #2563eb; color: #2563eb;
+  background: none; border-radius: 5px; padding: 3px 10px; cursor: pointer; }
+.conferma { margin: 10px 0; padding: 9px 10px; border-radius: 7px;
+  border: 1px solid #b45309; background: color-mix(in srgb, #b45309 10%, transparent); }
+.conferma .che { margin: 0 0 6px; font-size: 12px; }
+.conferma pre { margin: 0 0 8px; max-height: 6.5em; overflow: auto; font-size: 11px;
+  white-space: pre-wrap; word-break: break-word; opacity: .8;
+  font-family: ui-monospace, SFMono-Regular, monospace; }
+.zona { margin-top: 12px; padding: 14px; text-align: center; font-size: 12px; opacity: .55;
+  border: 1.5px dashed var(--bordo); border-radius: 8px; }
+.zona.sopra { opacity: 1; border-color: #2563eb; color: #2563eb; }

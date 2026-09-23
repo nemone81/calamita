@@ -56,6 +56,23 @@ chrome.runtime.onMessage.addListener((msg: Messaggio, mittente, rispondi) => {
     case 'svuota':
       stato.svuota().then(rispondi); return true
 
+    // Gli SDK dei provider pesano ~950 KB: si caricano SOLO qui, alla prima
+    // estrazione vera. Un service worker MV3 viene riavviato di continuo, e il
+    // giro senza AI — che è il v0 — non deve pagarne il parsing.
+    case 'chiedi-anteprima-ai':
+      import('../ai/estrai.js')
+        .then((m) => m.anteprima())
+        .then((a) => rispondi(a ? { provider: a.provider.nome, modello: a.modello } : null))
+      return true
+
+    case 'estrai-con-ai':
+      import('../ai/estrai.js').then((m) => m.estraiConAI(msg.ingresso)).then(async (e) => {
+        if (!e.ok) return rispondi(await stato.impostaEsito(false, e.errore))
+        await stato.aggiungiSlot(e.slot)
+        rispondi(await stato.impostaEsito(true, `${e.slot.length} valori da ${e.provider}`))
+      })
+      return true
+
     case 'riempi-con':
       riempiNelTabAttivo(msg.slotId).then(rispondi); return true
 

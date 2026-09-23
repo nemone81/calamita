@@ -1,0 +1,21 @@
+:root { color-scheme: light dark; --bordo: color-mix(in srgb, currentColor 18%, transparent); }
+* { box-sizing: border-box; }
+body { margin: 0 auto; padding: 28px 20px; max-width: 42rem;
+  font: 14px/1.5 ui-sans-serif, system-ui, -apple-system, sans-serif; }
+h1 { font-size: 18px; margin: 0 0 10px; }
+.intro { opacity: .8; margin: 0 0 8px; }
+fieldset { border: 1px solid var(--bordo); border-radius: 8px; padding: 12px 14px; margin: 14px 0; }
+fieldset[data-attivo="si"] { border-color: #2563eb; }
+legend { display: flex; align-items: center; gap: 8px; padding: 0 6px; font-weight: 600; }
+legend .host { font-weight: 400; opacity: .55; font-size: 12px; font-family: ui-monospace, monospace; }
+.riga { display: flex; gap: 8px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
+label { font-size: 12px; opacity: .7; min-width: 5rem; }
+input, select { font: inherit; padding: 6px 8px; border-radius: 6px;
+  border: 1px solid var(--bordo); background: transparent; color: inherit; flex: 1; min-width: 12rem; }
+button { font: inherit; font-size: 13px; padding: 6px 12px; border-radius: 6px;
+  border: 1px solid var(--bordo); background: transparent; color: inherit; cursor: pointer; }
+button:hover { background: color-mix(in srgb, currentColor 8%, transparent); }
+button.primario { border-color: #2563eb; color: #2563eb; }
+.stato { font-size: 12px; opacity: .7; margin: 6px 0 0; min-height: 1.3em; }
+.salvato { color: #1a7f37; font-size: 13px; }
+a { color: inherit; }

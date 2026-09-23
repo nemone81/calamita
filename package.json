@@ -21,5 +21,10 @@
     "typescript": "^5.7.0",
     "vite": "^6.0.0",
     "vitest": "^3.0.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.127.0",
+    "@google/genai": "^2.24.0",
+    "openai": "^7.21.0"
   }
 }

@@ -15,6 +15,7 @@ export default defineManifest({
   ],
   background: { service_worker: 'src/background/index.ts', type: 'module' },
   side_panel: { default_path: 'src/sidepanel/index.html' },
+  options_page: 'src/options/index.html',
   action: { default_title: 'Incolla — apri il pannello' },
   content_scripts: [{
     matches: ['<all_urls>'],

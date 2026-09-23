@@ -15,6 +15,22 @@
   <textarea id="incollaQui" rows="3"
     placeholder="Incolla qui i dati, oppure seleziona il testo in una pagina e premi ⌘⇧Y"></textarea>
 
+  <div class="azioni">
+    <button id="conAI" class="piatto">Estrai con AI…</button>
+    <button id="opzioni" class="piatto" title="Chiavi e provider">Opzioni</button>
+  </div>
+
+  <!-- T15: la conferma nomina SEMPRE il destinatario. Con cinque provider possibili,
+       sapere quale è parte del consenso, non un dettaglio di copy. -->
+  <div id="conferma" class="conferma" hidden>
+    <p class="che">Stai per mandare <b id="cosa"></b> a <b id="chi"></b>.</p>
+    <pre id="assaggio"></pre>
+    <div class="azioni">
+      <button id="vai" class="primario">Manda</button>
+      <button id="annulla" class="piatto">Annulla</button>
+    </div>
+  </div>
+
   <p id="campo" class="campo"></p>
   <p id="esito" class="esito" hidden></p>
 
@@ -23,6 +39,8 @@
   <p id="vuoto" class="nota">
     Nessuna chip. Incolla dei dati qui sopra: vengono spezzati e riconosciuti da soli.
   </p>
+
+  <div id="zona" class="zona">Trascina qui un'immagine o un PDF</div>
 
   <script type="module" src="index.ts"></script>
 </body>

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="claude-inspector-project" content="incolla">
+  <title>Incolla — opzioni</title>
+  <link rel="stylesheet" href="stile.css">
+</head>
+<body>
+  <h1>Incolla</h1>
+  <p class="intro">
+    L'estrazione con l'AI è facoltativa: senza chiave, Incolla riconosce comunque
+    email, telefoni, CAP, date, importi, IBAN, codici fiscali e partite IVA in locale,
+    senza mandare niente a nessuno.
+  </p>
+  <p class="intro">
+    La chiave è <b>tua</b> e resta in questo browser. Paghi tu ciò che consumi, e
+    nessun dato passa da un server nostro — perché non ce n'è uno.
+  </p>
+
+  <div id="provider"></div>
+  <p id="salvato" class="salvato" hidden>Salvato.</p>
+
+  <script type="module" src="index.ts"></script>
+</body>
+</html>

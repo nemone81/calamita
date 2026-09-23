@@ -1,4 +1,4 @@
-import { STATO_VUOTO, type Messaggio, type Stato } from '../shared/messaggi.js'
+import { STATO_VUOTO, type AnteprimaAI, type IngressoAI, type Messaggio, type Stato } from '../shared/messaggi.js'
 import type { Slot } from '../shared/tipi.js'
 
 const el = {
@@ -8,6 +8,15 @@ const el = {
   esito: document.getElementById('esito') as HTMLParagraphElement,
   vuoto: document.getElementById('vuoto') as HTMLParagraphElement,
   svuota: document.getElementById('svuota') as HTMLButtonElement,
+  conAI: document.getElementById('conAI') as HTMLButtonElement,
+  opzioni: document.getElementById('opzioni') as HTMLButtonElement,
+  conferma: document.getElementById('conferma') as HTMLDivElement,
+  cosa: document.getElementById('cosa') as HTMLElement,
+  chi: document.getElementById('chi') as HTMLElement,
+  assaggio: document.getElementById('assaggio') as HTMLPreElement,
+  vai: document.getElementById('vai') as HTMLButtonElement,
+  annulla: document.getElementById('annulla') as HTMLButtonElement,
+  zona: document.getElementById('zona') as HTMLDivElement,
 }
 
 let stato: Stato = STATO_VUOTO
@@ -101,6 +110,86 @@ chrome.runtime.onMessage.addListener((m: Messaggio) => {
 })
 
 manda({ tipo: 'leggi-stato' }).then((s) => { stato = s; disegna() })
+
+// ---------- T14 + T15: estrazione con AI, sempre preceduta da una conferma ----------
+
+let inAttesa: IngressoAI | null = null
+
+/**
+ * Non si chiama il modello di nascosto. Si dice cosa esce e VERSO CHI, si mostra
+ * un assaggio di ciò che parte, e si aspetta un clic.
+ */
+async function chiediConferma(ingresso: IngressoAI) {
+  const a = await (chrome.runtime.sendMessage({ tipo: 'chiedi-anteprima-ai' }) as Promise<AnteprimaAI>)
+  if (!a) {
+    stato = { ...stato, ultimoEsito: { ok: false, testo: 'scegli un provider nelle opzioni' } }
+    disegna()
+    return
+  }
+
+  inAttesa = ingresso
+  el.cosa.textContent = ingresso.tipo === 'testo'
+    ? `${ingresso.testo.length} caratteri di testo`
+    : `un'immagine (${Math.round(ingresso.base64.length * 0.75 / 1024)} KB)`
+  el.chi.textContent = `${a.provider} · ${a.modello}`
+  el.assaggio.textContent = ingresso.tipo === 'testo'
+    ? ingresso.testo.slice(0, 400) + (ingresso.testo.length > 400 ? '\n…' : '')
+    : '(il contenuto dell\u2019immagine)'
+  el.conferma.hidden = false
+}
+
+el.vai.addEventListener('click', async () => {
+  if (!inAttesa) return
+  const ingresso = inAttesa
+  inAttesa = null
+  el.conferma.hidden = true
+  el.vai.disabled = true
+  stato = { ...stato, ultimoEsito: { ok: true, testo: 'estrazione in corso…' } }
+  disegna()
+  stato = await manda({ tipo: 'estrai-con-ai', ingresso })
+  el.vai.disabled = false
+  disegna()
+})
+
+el.annulla.addEventListener('click', () => { inAttesa = null; el.conferma.hidden = true })
+
+el.conAI.addEventListener('click', () => {
+  const testo = el.incollaQui.value.trim()
+  if (!testo) {
+    stato = { ...stato, ultimoEsito: { ok: false, testo: 'incolla prima del testo qui sopra' } }
+    disegna()
+    return
+  }
+  chiediConferma({ tipo: 'testo', testo })
+})
+
+el.opzioni.addEventListener('click', () => chrome.runtime.openOptionsPage())
+
+// trascinamento di un'immagine o di un PDF: la scansione entra da qui
+for (const evento of ['dragenter', 'dragover'] as const) {
+  el.zona.addEventListener(evento, (e) => { e.preventDefault(); el.zona.classList.add('sopra') })
+}
+for (const evento of ['dragleave', 'drop'] as const) {
+  el.zona.addEventListener(evento, () => el.zona.classList.remove('sopra'))
+}
+el.zona.addEventListener('drop', async (e) => {
+  e.preventDefault()
+  const file = e.dataTransfer?.files?.[0]
+  if (!file) return
+  if (!/^image\/|^application\/pdf$/.test(file.type)) {
+    stato = { ...stato, ultimoEsito: { ok: false, testo: 'solo immagini o PDF' } }
+    disegna()
+    return
+  }
+  chiediConferma({ tipo: 'immagine', base64: await inBase64(file), mime: file.type })
+})
+
+const inBase64 = (f: File) => new Promise<string>((risolvi, rifiuta) => {
+  const r = new FileReader()
+  r.onload = () => risolvi(String(r.result).split(',')[1] ?? '')
+  r.onerror = () => rifiuta(r.error)
+  r.readAsDataURL(f)
+})
 
 const fuga = (s: string) =>
   s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!))

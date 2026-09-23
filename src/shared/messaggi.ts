@@ -15,10 +15,20 @@ export type Messaggio =
   | { tipo: 'modifica-slot'; slotId: string; etichetta?: string; valore?: string }
   | { tipo: 'elimina-slot'; slotId: string }
   | { tipo: 'svuota' }
+  | { tipo: 'chiedi-anteprima-ai' }
+  | { tipo: 'estrai-con-ai'; ingresso: IngressoAI }
   // service worker → pagina
   | { tipo: 'riempi-campo-attivo'; valore: string }
   // service worker → pannello (broadcast)
   | { tipo: 'stato-cambiato'; stato: Stato }
+
+/** Copia locale del tipo di `ai/provider/tipi.ts`: il contratto dei messaggi non importa da lì. */
+export type IngressoAI =
+  | { tipo: 'testo'; testo: string }
+  | { tipo: 'immagine'; base64: string; mime: string }
+
+/** Cosa il pannello mostra PRIMA di chiamare: a chi vanno i dati, e quali. */
+export type AnteprimaAI = { provider: string; modello: string } | null
 
 export type Stato = {
   slot: Slot[]

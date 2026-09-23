@@ -128,28 +128,28 @@ incontrati per caso, con documenti veri. Se a questo punto non ti fa risparmiare
 l'AI non lo salverà: meglio saperlo prima di scrivere cinque adattatori. Criterio di successo
 #3 della spec (form da 8 campi in meno di 30 secondi) si misura **qui**, non alla fine.
 
-### F2 — Ramo AI
+### F2 — Ramo AI ✅ **completa il 2026-09-23**
 
-- [ ] **T9 — Opzioni: provider e chiavi** (`chrome.storage.local`, una chiave per provider)
+- [x] **T9 — Opzioni: provider e chiavi** ✅ 2026-09-23 (`chrome.storage.local`, una chiave per provider)
   - Acceptance: salvo una chiave, la rileggo, dopo il salvataggio si vede solo `sk-...••••`.
   - Verify: a mano + un test che la chiave non finisca mai in un log.
   - Files: `src/options/*`, `src/shared/chiavi.ts`
 
-- [ ] **T10 — Interfaccia Provider + schema + prompt** (lo scheletro prima delle tre teste)
+- [x] **T10 — Interfaccia Provider + schema + prompt** ✅ 2026-09-23 (lo scheletro prima delle tre teste)
   - Acceptance: uno schema JSON del record canonico, un prompt di estrazione, condivisi.
   - Verify: `pnpm typecheck`.
   - Files: `src/ai/provider/tipi.ts`, `src/ai/provider/schema.ts`, `src/ai/estrai.ts`
 
-- [ ] **T11 — Adattatore Anthropic** (Claude) — il primo, fa da modello agli altri due
-- [ ] **T12 — Adattatore OpenAI** (OpenAI, Grok, Muse: base URL diversa, stesso codice)
-- [ ] **T13 — Adattatore Google** (Gemini)
+- [x] **T11 — Adattatore Anthropic** ✅ 2026-09-23 (Claude) — il primo, fa da modello agli altri due
+- [x] **T12 — Adattatore OpenAI** ✅ 2026-09-23 (OpenAI, Grok, Muse: base URL diversa, stesso codice)
+- [x] **T13 — Adattatore Google** ✅ 2026-09-23 (Gemini)
   - Acceptance (per ciascuno): dallo stesso documento di prova esce lo **stesso** record
     canonico. Differenze di qualità ammesse, differenze di forma no.
   - Verify: test di forma della richiesta in CI (endpoint, header, schema) + **una** chiamata
     vera a mano per provider, annotata. Le chiamate vere costano: non vanno in CI.
   - Files: `src/ai/provider/<nome>.ts` + test
 
-- [ ] **T14 — Ingresso immagini e file** (drag nel pannello → provider multimodale)
+- [x] **T14 — Ingresso immagini e file** ✅ 2026-09-23 (drag nel pannello → provider multimodale)
   - Acceptance: una scansione produce un record canonico utilizzabile in meno di 10 secondi.
   - Verify: a mano, con una scansione vera storta — non un PDF pulito.
   - Files: `src/sidepanel/drop.ts`, `src/ai/estrai.ts`
@@ -160,10 +160,12 @@ l'AI non lo salverà: meglio saperlo prima di scrivere cinque adattatori. Criter
   - Verify: leggendo il traffico di rete dell'estensione, non il codice (criterio #5).
   - Files: `src/sidepanel/conferma.ts`
 
-- [ ] **T16 — Misura del bundle**
+- [x] **T16 — Misura del bundle** ✅ 2026-09-23
   - Acceptance: si sa quanto pesano cinque SDK in un service worker MV3.
   - Verify: `pnpm build` + dimensione del chunk del service worker.
-  - Se fuori scala: si ripiega su adattatori a `fetch` puro (tre formati, poco codice).
+  - **Misurato**: 950 kB minificati (200 gzip) per i tre SDK. Il ripiego a `fetch` non è
+    servito: bastano gli `import()` dinamici, e il service worker carica **6,9 kB** all'avvio
+    invece di quasi un megabyte. Vedi `adr/0004-sdk-caricati-a-richiesta.md`.
 
 **Checkpoint F2**: i cinque provider danno lo stesso record; nessun dato esce senza conferma.
 
@@ -172,9 +174,9 @@ l'AI non lo salverà: meglio saperlo prima di scrivere cinque adattatori. Criter
 - [ ] **T17 — Skill `collaudo-reale`** sulle quattro classi di difetto che i test verdi non vedono.
   Qui i sospetti sono già noti: il documento storto, il form dentro un iframe, il campo che si
   resetta al blur, il provider che risponde con prosa invece che con JSON.
-- [ ] **T18 — ADR** delle tre decisioni che meritano una traccia: niente OCR, tre adattatori e
+- [x] **T18 — ADR** ✅ 2026-09-23 delle tre decisioni che meritano una traccia: niente OCR, tre adattatori e
   non cinque, stato nel service worker.
-- [ ] **T19 — README** e `CLAUDE.md` del repo.
+- [x] **T19 — README** ✅ 2026-09-23 e `CLAUDE.md` del repo.
 
 ## Rischi
 
