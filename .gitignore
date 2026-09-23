@@ -4,3 +4,4 @@ dist/
 *.local
 test-results/
 playwright-report/
+calamita.zip

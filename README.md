@@ -34,6 +34,13 @@ chiede l'elenco al tuo account invece di fidarsi di id scritti a memoria.
 
 ## Installazione
 
+**Senza toccare il codice** (consigliata): scarica `calamita.zip` dall'ultima
+[release](https://github.com/nemone81/calamita/releases), scompattalo, poi in Chrome apri
+`chrome://extensions`, attiva **Modalità sviluppatore** in alto a destra, clicca
+**Carica estensione non pacchettizzata** e scegli la cartella scompattata.
+
+**Dal sorgente:**
+
 ```bash
 pnpm install
 pnpm build
@@ -42,7 +49,7 @@ pnpm build
 Poi `chrome://extensions` → Modalità sviluppatore → **Carica estensione non pacchettizzata**
 → scegli `dist/`.
 
-> Chrome 153 ignora `--load-extension` da riga di comando: il caricamento è manuale.
+> Chrome 153 ignora `--load-extension` da riga di comando: il caricamento è sempre manuale.
 
 ## Sviluppo
 
@@ -88,3 +95,7 @@ frame stanno i campi, che è ciò che smaschera i form dentro un iframe.
 
 Non è un test di CI: tocca la rete e un sito di terzi. È lo strumento per i difetti che
 una suite verde non vede.
+
+## Licenza
+
+MIT. Fai pure quello che ti pare, e se lo migliori apri una pull request.
