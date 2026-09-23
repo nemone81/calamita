@@ -2,11 +2,11 @@ import { test, expect } from '@playwright/test'
 import { iniettaRiempi, urlFixture } from './aiuto.js'
 
 declare global {
-  interface Window { Incolla: typeof import('../../src/fill/riempi.js') }
+  interface Window { Calamita: typeof import('../../src/fill/riempi.js') }
 }
 
 const riempi = (page: import('@playwright/test').Page, sel: string, valore: string) =>
-  page.evaluate(([s, v]) => window.Incolla.riempi(document.querySelector(s!), v!), [sel, valore])
+  page.evaluate(([s, v]) => window.Calamita.riempi(document.querySelector(s!), v!), [sel, valore])
 
 test.describe('HTML puro', () => {
   test('riempie i campi e il DOM li mostra', async ({ page }) => {

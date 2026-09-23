@@ -1,7 +1,9 @@
-# Incolla
+# Calamita
 
-Estensione Chrome che spezza i dati di un documento in **chip** cliccabili e li mette nei
-campi di un form, senza il ciclo alt-tab → copia → alt-tab → incolla ripetuto per ogni campo.
+Estensione Chrome che spezza i dati di un documento in **chip** e le attacca ai campi giusti
+di un form, senza il ciclo alt-tab → copia → alt-tab → incolla ripetuto per ogni campo.
+
+Copi tutto in una volta, incolli una volta sola, e ogni valore va dove deve.
 
 ## Come si usa
 

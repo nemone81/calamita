@@ -11,7 +11,7 @@ const TIPI_NON_TESTUALI = new Set([
   'checkbox', 'radio', 'file', 'submit', 'reset', 'button', 'image', 'hidden', 'range', 'color',
 ])
 
-const CLASSE = 'incolla-campo-attivo'
+const CLASSE = 'calamita-campo-attivo'
 let ultimo: HTMLElement | null = null
 
 export function avviaTracciamento(alCambio: (descrizione: string | null) => void): void {
@@ -57,9 +57,9 @@ function riempibile(e: HTMLElement): boolean {
 }
 
 function iniettaStile(): void {
-  if (document.getElementById('incolla-stile')) return
+  if (document.getElementById('calamita-stile')) return
   const s = document.createElement('style')
-  s.id = 'incolla-stile'
+  s.id = 'calamita-stile'
   s.textContent = `.${CLASSE}{outline:2px solid #2563eb!important;outline-offset:1px!important}`
   document.documentElement.appendChild(s)
 }

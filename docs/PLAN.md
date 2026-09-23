@@ -1,4 +1,4 @@
-# Piano tecnico — Incolla
+# Piano tecnico — Calamita
 
 > Fase 2 di `spec-driven-development`. Da rivedere prima di scrivere codice.
 > Riferimento: `SPEC.md` · 2026-09-23

@@ -4,7 +4,7 @@ import { iniettaCampoAttivo, iniettaRiempi, urlFixture } from './aiuto.js'
 declare global {
   interface Window {
     CampoAttivo: typeof import('../../src/content/campo-attivo.js')
-    Incolla: typeof import('../../src/fill/riempi.js')
+    Calamita: typeof import('../../src/fill/riempi.js')
     cambi: (string | null)[]
   }
 }
@@ -53,11 +53,11 @@ test.describe('memoria del campo', () => {
   test('il campo tracciato è evidenziato', async ({ page }) => {
     await avvia(page, 'plain.html')
     await page.locator('#nome').focus()
-    await expect(page.locator('#nome')).toHaveClass(/incolla-campo-attivo/)
+    await expect(page.locator('#nome')).toHaveClass(/calamita-campo-attivo/)
 
     await page.locator('#email').focus()
-    await expect(page.locator('#nome')).not.toHaveClass(/incolla-campo-attivo/)
-    await expect(page.locator('#email')).toHaveClass(/incolla-campo-attivo/)
+    await expect(page.locator('#nome')).not.toHaveClass(/calamita-campo-attivo/)
+    await expect(page.locator('#email')).toHaveClass(/calamita-campo-attivo/)
   })
 
   test('dimentica un campo tolto dal DOM', async ({ page }) => {
@@ -88,7 +88,7 @@ test('il giro completo: traccia un campo e ci scrive dentro', async ({ page }) =
   await page.evaluate(() => (document.activeElement as HTMLElement)?.blur())
 
   const ok = await page.evaluate(() =>
-    window.Incolla.riempi(window.CampoAttivo.campoAttivo(), 'RSSMRA85T10A562S').ok)
+    window.Calamita.riempi(window.CampoAttivo.campoAttivo(), 'RSSMRA85T10A562S').ok)
 
   expect(ok).toBe(true)
   await expect(page.locator('#txt2')).toHaveValue('RSSMRA85T10A562S')

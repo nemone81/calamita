@@ -2,9 +2,9 @@ import { defineManifest } from '@crxjs/vite-plugin'
 
 export default defineManifest({
   manifest_version: 3,
-  name: 'Incolla',
+  name: 'Calamita',
   version: '0.1.0',
-  description: 'Spezza i dati di un documento in chip e riempie i form con un clic.',
+  description: 'Attacca i dati di un documento ai campi giusti di un form, con un clic.',
   permissions: ['sidePanel', 'storage', 'scripting', 'activeTab', 'webNavigation'],
   host_permissions: [
     'https://api.anthropic.com/*',
@@ -16,7 +16,7 @@ export default defineManifest({
   background: { service_worker: 'src/background/index.ts', type: 'module' },
   side_panel: { default_path: 'src/sidepanel/index.html' },
   options_page: 'src/options/index.html',
-  action: { default_title: 'Incolla — apri il pannello' },
+  action: { default_title: 'Calamita — apri il pannello' },
   content_scripts: [{
     matches: ['<all_urls>'],
     js: ['src/content/index.ts'],
@@ -26,7 +26,7 @@ export default defineManifest({
   commands: {
     'apri-con-selezione': {
       suggested_key: { default: 'Ctrl+Shift+Y', mac: 'Command+Shift+Y' },
-      description: 'Apri Incolla con il testo selezionato',
+      description: 'Apri Calamita con il testo selezionato',
     },
   },
 })

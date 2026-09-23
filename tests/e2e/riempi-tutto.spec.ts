@@ -31,7 +31,7 @@ async function riempiTutto(page: Page, slot: Slot[]) {
     for (const a of scelte) {
       const s = slot.find((x) => x.id === a.slotId)!
       const e = elementi[a.indiceCampo]!
-      if (window.Incolla.riempi(e, s.valore).ok) fatti.push(`${e.id}=${s.valore}`)
+      if (window.Calamita.riempi(e, s.valore).ok) fatti.push(`${e.id}=${s.valore}`)
     }
     return { fatti, scelte: scelte.length, campi: campi.length }
   }, slot)

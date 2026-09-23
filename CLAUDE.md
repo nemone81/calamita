@@ -1,7 +1,7 @@
-# Incolla
+# Calamita
 
-Estensione Chrome MV3 che spezza i dati di un documento in **chip** cliccabili per compilare
-form web senza il ciclo alt-tab → copia → alt-tab → incolla.
+Estensione Chrome MV3 che spezza i dati di un documento in **chip** e le attacca ai campi
+giusti di un form, senza il ciclo alt-tab → copia → alt-tab → incolla.
 
 - Spec: `docs/SPEC.md` · Piano: `docs/PLAN.md` (copie anche in `~/Dropbox/Claude/tooling/chrome-extensions/incolla/`)
 - Comandi: `pnpm test` · `pnpm typecheck` · `pnpm build` · `pnpm dev`

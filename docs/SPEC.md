@@ -1,4 +1,4 @@
-# Spec: Incolla — appunti a slot per compilare form web
+# Spec: Calamita — i dati si attaccano ai campi giusti
 
 > Stato: **bozza in revisione** · 2026-09-23
 > Alla creazione del repo questo file si sposta in `~/Projects/incolla/docs/SPEC.md` (versionato).
