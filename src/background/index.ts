@@ -1,4 +1,4 @@
-import { abbina } from '../mappa/abbina.js'
+import { abbina, type Campo } from '../mappa/abbina.js'
 import { segmenta } from '../extract/segment.js'
 import { tipizza } from '../extract/tipizza.js'
 import type { Messaggio } from '../shared/messaggi.js'
@@ -70,7 +70,11 @@ chrome.runtime.onMessage.addListener((msg: Messaggio, mittente, rispondi) => {
       assorbi(msg.testo).then(rispondi); return true
 
     case 'campo-attivo-cambiato':
-      stato.impostaCampoAttivo(msg.descrizione).then(rispondi); return true
+      // `mittente.frameId` è l'unico modo di sapere DOVE sta il campo: senza,
+      // il riempimento va a tutti i frame e risponde il primo, che su una pagina
+      // con reCAPTCHA è un iframe senza campi
+      stato.impostaCampoAttivo(msg.descrizione, mittente.frameId ?? 0).then(rispondi)
+      return true
 
     case 'modifica-slot':
       stato.modificaSlot(msg.slotId, { etichetta: msg.etichetta, valore: msg.valore }).then(rispondi)
@@ -122,9 +126,11 @@ async function riempiNelTabAttivo(slotId: string) {
   if (!tab?.id) return stato.impostaEsito(false, 'nessuna scheda attiva')
 
   try {
-    const esito = await chrome.tabs.sendMessage(tab.id, {
-      tipo: 'riempi-campo-attivo', valore: slot.valore,
-    })
+    const esito = await chrome.tabs.sendMessage(
+      tab.id,
+      { tipo: 'riempi-campo-attivo', valore: slot.valore },
+      { frameId: s.frameCampoAttivo ?? 0 },
+    )
     return esito?.ok
       ? stato.impostaEsito(true, `${slot.etichetta} → ${esito.dove}`)
       : stato.impostaEsito(false, esito?.motivo ?? 'nessun campo selezionato')
@@ -135,9 +141,11 @@ async function riempiNelTabAttivo(slotId: string) {
       const files = chrome.runtime.getManifest().content_scripts?.[0]?.js
       if (!files?.length) throw new Error('niente content script nel manifest')
       await chrome.scripting.executeScript({ target: { tabId: tab.id }, files })
-      const esito = await chrome.tabs.sendMessage(tab.id, {
-        tipo: 'riempi-campo-attivo', valore: slot.valore,
-      })
+      const esito = await chrome.tabs.sendMessage(
+        tab.id,
+        { tipo: 'riempi-campo-attivo', valore: slot.valore },
+        { frameId: s.frameCampoAttivo ?? 0 },
+      )
       return esito?.ok
         ? stato.impostaEsito(true, `${slot.etichetta} → ${esito.dove}`)
         : stato.impostaEsito(false, esito?.motivo ?? 'clicca prima un campo del form')
@@ -158,26 +166,34 @@ async function proponi() {
   const tab = await tabAttivo()
   if (!tab?.id) return { righe: [], avanzate: [] }
 
-  let campi
-  try {
-    const r = await parlaAllaPagina(tab.id, { tipo: 'scansiona-campi' })
-    campi = r?.campi ?? []
-  } catch {
+  const campi = await scansionaOgniFrame(tab.id)
+  if (campi === null) {
     await stato.impostaEsito(false, 'questa pagina non è raggiungibile: ricaricala')
+    return { righe: [], avanzate: [] }
+  }
+  if (!campi.length) {
+    await stato.impostaEsito(false, 'nessun campo di testo trovato in questa pagina')
     return { righe: [], avanzate: [] }
   }
 
   const scelte = abbina(s.slot, campi)
+  if (!scelte.length) {
+    // distinguere i due casi conta: "non ho trovato campi" e "non so dove mettere
+    // queste chip" si risolvono in modi opposti
+    await stato.impostaEsito(false,
+      `${campi.length} campi trovati, ma nessuno abbinabile a queste chip`)
+  }
   const abbinati = new Set(scelte.map((a) => a.slotId))
 
   return {
     righe: scelte.flatMap((a) => {
       const slot = s.slot.find((x) => x.id === a.slotId)
-      const campo = campi.find((c: { indice: number }) => c.indice === a.indiceCampo)
+      const campo = campi.find((c) => c.indice === a.indiceCampo)
       if (!slot || !campo) return []
       return [{
         slotId: slot.id, etichetta: slot.etichetta, valore: slot.valore,
-        indice: a.indiceCampo, campo: campo.etichetta ?? campo.name ?? `campo ${a.indiceCampo + 1}`,
+        indice: campo.indiceLocale, frameId: campo.frameId,
+        campo: campo.etichetta ?? campo.name ?? `campo ${a.indiceCampo + 1}`,
         motivo: a.motivo, punteggio: a.punteggio,
       }]
     }),
@@ -186,21 +202,76 @@ async function proponi() {
   }
 }
 
-async function applica(riempimenti: { indice: number; valore: string }[]) {
+async function applica(riempimenti: { indice: number; frameId: number; valore: string }[]) {
   const tab = await tabAttivo()
   if (!tab?.id) return stato.impostaEsito(false, 'nessuna scheda attiva')
 
-  try {
-    const r = await parlaAllaPagina(tab.id, { tipo: 'riempi-molti', riempimenti })
-    const fatti = r?.fatti?.length ?? 0
-    const falliti = r?.falliti?.length ?? 0
-    return stato.impostaEsito(
-      fatti > 0,
-      falliti ? `${fatti} campi riempiti, ${falliti} no` : `${fatti} campi riempiti`,
-    )
-  } catch {
-    return stato.impostaEsito(false, 'questa pagina non è raggiungibile: ricaricala')
+  // ogni frame riempie i propri campi: gli indici valgono solo dentro un frame
+  const perFrame = new Map<number, { indice: number; valore: string }[]>()
+  for (const r of riempimenti) {
+    const lista = perFrame.get(r.frameId) ?? []
+    lista.push({ indice: r.indice, valore: r.valore })
+    perFrame.set(r.frameId, lista)
   }
+
+  let fatti = 0, falliti = 0
+  for (const [frameId, lista] of perFrame) {
+    try {
+      const r = await chrome.tabs.sendMessage(
+        tab.id, { tipo: 'riempi-molti', riempimenti: lista }, { frameId })
+      fatti += r?.fatti?.length ?? 0
+      falliti += r?.falliti?.length ?? 0
+    } catch {
+      falliti += lista.length
+    }
+  }
+
+  if (!riempimenti.length) return stato.impostaEsito(false, 'nessuna riga da riempire')
+  if (!fatti) return stato.impostaEsito(false, 'questa pagina non è raggiungibile: ricaricala')
+  return stato.impostaEsito(true,
+    falliti ? `${fatti} campi riempiti, ${falliti} no` : `${fatti} campi riempiti`)
+}
+
+/**
+ * Un form sta spesso dentro un iframe, e gli indici dei campi valgono solo dentro
+ * il frame che li ha prodotti: vanno tenuti insieme al frame di provenienza.
+ * Si rinumerano globalmente per l'abbinamento e si riconvertono al riempimento.
+ */
+async function scansionaOgniFrame(tabId: number): Promise<(Campo & { frameId: number; indiceLocale: number })[] | null> {
+  let frames: chrome.webNavigation.GetAllFrameResultDetails[] | null = null
+  try {
+    frames = await chrome.webNavigation.getAllFrames({ tabId })
+  } catch { /* niente permesso o pagina speciale: si prova col solo frame principale */ }
+
+  // se webNavigation non risponde o filtra via tutto, resta il frame principale:
+  // una lista vuota farebbe saltare il ciclo e sembrare la pagina irraggiungibile
+  const trovati = frames?.filter((f) => f.url?.startsWith('http')).map((f) => f.frameId) ?? []
+  const ids = trovati.length ? trovati : [0]
+  const tutti: (Campo & { frameId: number; indiceLocale: number })[] = []
+  let raggiunto = false
+
+  for (const frameId of ids) {
+    let campi: Campo[]
+    try {
+      const r = await chrome.tabs.sendMessage(tabId, { tipo: 'scansiona-campi' }, { frameId })
+      campi = r?.campi ?? []
+    } catch {
+      // frame senza content script: lo si mette e si riprova, una volta sola
+      try {
+        const files = chrome.runtime.getManifest().content_scripts?.[0]?.js
+        if (!files?.length) continue
+        await chrome.scripting.executeScript({ target: { tabId, frameIds: [frameId] }, files })
+        const r = await chrome.tabs.sendMessage(tabId, { tipo: 'scansiona-campi' }, { frameId })
+        campi = r?.campi ?? []
+      } catch { continue }
+    }
+    raggiunto = true
+    for (const c of campi) {
+      tutti.push({ ...c, frameId, indiceLocale: c.indice, indice: tutti.length })
+    }
+  }
+
+  return raggiunto ? tutti : null
 }
 
 const tabAttivo = async () =>

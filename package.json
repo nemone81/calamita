@@ -10,7 +10,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
-    "lint": "eslint src tests --fix"
+    "lint": "eslint src tests --fix",
+    "collaudo": "node scripts/collaudo.mjs"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.0.0",

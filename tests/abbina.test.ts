@@ -130,3 +130,24 @@ describe('il risultato è ordinato come il form', () => {
     expect(abbina(s, c).map((a) => a.indiceCampo)).toEqual([0, 1])
   })
 })
+
+describe('le parole generiche non bastano ad abbinare', () => {
+  // trovato sul form vero: "Codice Fiscale" finiva in "Codice Agenzia"
+  it('"Codice Fiscale" non finisce in "Codice Agenzia"', () => {
+    const s = [chip('Codice Fiscale', '00885091009')]
+    const c = [campo(0, { etichetta: 'Codice Agenzia' })]
+    expect(abbina(s, c)).toEqual([])
+  })
+
+  it('"Email Referente Azienda" abbina comunque una PEC, perché "email" non è generica', () => {
+    const s = [chip('PEC', 'x@y.it', 'email')]
+    const c = [campo(0, { etichetta: 'Email Referente Azienda Interessata' })]
+    expect(abbina(s, c)).toHaveLength(1)
+  })
+
+  it('due etichette che condividono solo parole generiche non si abbinano', () => {
+    const s = [chip('Numero pratica', '12345')]
+    const c = [campo(0, { etichetta: 'Numero polizza' })]
+    expect(abbina(s, c)).toEqual([])
+  })
+})

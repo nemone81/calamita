@@ -55,6 +55,7 @@ function leggibile(m: string): string {
     'elemento-non-riempibile': 'quel campo non si può riempire',
     'campo-in-sola-lettura': 'campo in sola lettura',
     'campo-disabilitato': 'campo disabilitato',
-    'nessuna-opzione-corrispondente': "nessuna opzione corrisponde a quel valore",
+    'nessuna-opzione-corrispondente': 'nessuna opzione corrisponde a quel valore',
+    'il campo accetta solo numeri': 'il campo accetta solo numeri',
   }[m] ?? m
 }

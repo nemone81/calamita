@@ -18,7 +18,7 @@ export type Messaggio =
   | { tipo: 'chiedi-anteprima-ai' }
   | { tipo: 'estrai-con-ai'; ingresso: IngressoAI }
   | { tipo: 'proponi-abbinamenti' }
-  | { tipo: 'applica-abbinamenti'; riempimenti: { indice: number; valore: string }[] }
+  | { tipo: 'applica-abbinamenti'; riempimenti: { indice: number; frameId: number; valore: string }[] }
   // service worker → pagina
   | { tipo: 'riempi-campo-attivo'; valore: string }
   | { tipo: 'scansiona-campi' }
@@ -38,15 +38,19 @@ export type Stato = {
   slot: Slot[]
   /** cosa verrà riempito al prossimo clic su una chip; null se nessun campo è stato toccato */
   campoAttivo: string | null
+  /** in quale frame sta quel campo: senza, il messaggio va a tutti e risponde il primo
+      (su una pagina con reCAPTCHA è un iframe vuoto) */
+  frameCampoAttivo: number | null
   ultimoEsito: { ok: boolean; testo: string } | null
 }
 
 /** Una proposta di riempimento automatico, da mostrare PRIMA di scrivere qualcosa. */
 export type Proposta = {
   righe: { slotId: string; etichetta: string; valore: string
-           indice: number; campo: string; motivo: string; punteggio: number }[]
+           indice: number; frameId: number
+           campo: string; motivo: string; punteggio: number }[]
   /** chip per cui non si è trovato un campo: restano da piazzare a mano */
   avanzate: { slotId: string; etichetta: string }[]
 }
 
-export const STATO_VUOTO: Stato = { slot: [], campoAttivo: null, ultimoEsito: null }
+export const STATO_VUOTO: Stato = { slot: [], campoAttivo: null, frameCampoAttivo: null, ultimoEsito: null }

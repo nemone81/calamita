@@ -51,10 +51,12 @@ export const eliminaSlot = async (id: string): Promise<Stato> => {
 
 export const svuota = (): Promise<Stato> => scrivi(STATO_VUOTO)
 
-export const impostaCampoAttivo = async (descrizione: string | null): Promise<Stato> => {
+export const impostaCampoAttivo = async (
+  descrizione: string | null, frameId: number | null,
+): Promise<Stato> => {
   const s = await leggi()
-  if (s.campoAttivo === descrizione) return s
-  return scrivi({ ...s, campoAttivo: descrizione })
+  if (s.campoAttivo === descrizione && s.frameCampoAttivo === frameId) return s
+  return scrivi({ ...s, campoAttivo: descrizione, frameCampoAttivo: frameId })
 }
 
 export const impostaEsito = async (ok: boolean, testo: string): Promise<Stato> => {

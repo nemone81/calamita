@@ -1,5 +1,5 @@
 import type { Slot, TipoSlot } from '../shared/tipi.js'
-import { CONCETTI, PAROLE_PER_TIPO, normalizza } from './vocabolario.js'
+import { CONCETTI, GENERICHE, PAROLE_PER_TIPO, normalizza } from './vocabolario.js'
 
 /** Un campo del form, descritto dal content script. Niente riferimenti al DOM. */
 export type Campo = {
@@ -132,10 +132,18 @@ function contiene(testo: string, frase: string): boolean {
   return new RegExp(`(^|\\s)${frase.replace(/\s+/g, '\\s+')}($|\\s)`).test(testo)
 }
 
+/**
+ * Quanto si somigliano due etichette. Le parole generiche non contano: due campi
+ * che condividono solo "codice" non parlano della stessa cosa.
+ */
 function sovrapposizione(a: string, b: string): number {
-  const pa = new Set(a.split(' ').filter((w) => w.length > 2))
-  const pb = new Set(b.split(' ').filter((w) => w.length > 2))
+  const utili = (s: string) =>
+    new Set(s.split(' ').filter((w) => w.length > 2 && !GENERICHE.has(w)))
+
+  const pa = utili(a)
+  const pb = utili(b)
   if (!pa.size || !pb.size) return 0
+
   let comuni = 0
   for (const w of pa) if (pb.has(w)) comuni++
   return comuni / Math.min(pa.size, pb.size)

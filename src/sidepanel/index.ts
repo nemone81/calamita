@@ -135,8 +135,13 @@ el.riempiTutto.addEventListener('click', async () => {
   escluse.clear()
 
   if (!proposta?.righe.length) {
-    stato = { ...stato, ultimoEsito: { ok: false, testo:
-      stato.slot.length ? 'nessun campo abbinabile in questa pagina' : 'prima servono delle chip' } }
+    // il messaggio preciso lo ha già messo il service worker, che sa se i campi
+    // erano zero o solo inabbinabili
+    if (!stato.slot.length) {
+      stato = { ...stato, ultimoEsito: { ok: false, testo: 'prima servono delle chip' } }
+    } else {
+      stato = await manda({ tipo: 'leggi-stato' })
+    }
     disegna()
     return
   }
@@ -192,7 +197,7 @@ el.applica.addEventListener('click', async () => {
   if (!proposta) return
   const riempimenti = proposta.righe
     .filter((r) => !escluse.has(r.slotId))
-    .map((r) => ({ indice: r.indice, valore: r.valore }))
+    .map((r) => ({ indice: r.indice, frameId: r.frameId, valore: r.valore }))
   el.proposta.hidden = true
   proposta = null
   stato = await manda({ tipo: 'applica-abbinamenti', riempimenti })

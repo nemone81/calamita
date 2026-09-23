@@ -72,3 +72,17 @@ grep -rlE 'anthropic|openai|googleapis|api\.x\.ai|api\.meta\.ai' src/ | grep -v 
   È il v1 (vedi `docs/SPEC.md` § Evoluzione).
 - **iframe cross-origin** (i campi delle carte di credito) sono irraggiungibili.
 - **App native macOS**: fuori portata, è un problema diverso.
+
+## Collaudo su una pagina vera
+
+```bash
+pnpm build
+pnpm collaudo https://esempio.it/modulo [dati.txt]
+```
+
+Carica l'estensione vera in un Chromium, apre la pagina, incolla i dati e riempie —
+poi stampa **cosa c'è davvero nei campi**, non cosa dice l'esito. Mostra anche in quale
+frame stanno i campi, che è ciò che smaschera i form dentro un iframe.
+
+Non è un test di CI: tocca la rete e un sito di terzi. È lo strumento per i difetti che
+una suite verde non vede.

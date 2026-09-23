@@ -5,7 +5,7 @@ export default defineManifest({
   name: 'Incolla',
   version: '0.1.0',
   description: 'Spezza i dati di un documento in chip e riempie i form con un clic.',
-  permissions: ['sidePanel', 'storage', 'scripting', 'activeTab'],
+  permissions: ['sidePanel', 'storage', 'scripting', 'activeTab', 'webNavigation'],
   host_permissions: [
     'https://api.anthropic.com/*',
     'https://api.openai.com/*',
@@ -21,7 +21,7 @@ export default defineManifest({
     matches: ['<all_urls>'],
     js: ['src/content/index.ts'],
     run_at: 'document_idle',
-    all_frames: false,
+    all_frames: true,   // i form stanno spesso dentro un iframe
   }],
   commands: {
     'apri-con-selezione': {

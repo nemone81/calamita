@@ -96,3 +96,32 @@ test.describe('casi che devono fallire, non fallire in silenzio', () => {
     expect(await riempi(page, '#nome', 'x')).toMatchObject({ ok: false, motivo: 'campo-in-sola-lettura' })
   })
 })
+
+test.describe('campi numerici — rifiutano in silenzio ciò che non è un numero', () => {
+  test('estrae il numero da un valore sporco', async ({ page }) => {
+    await page.goto(urlFixture('plain.html'))
+    await iniettaRiempi(page)
+    await page.evaluate(() => {
+      const n = document.createElement('input')
+      n.type = 'number'; n.id = 'quanti'
+      document.getElementById('f')!.append(n)
+    })
+
+    const esito = await riempi(page, '#quanti', '629 (2026)')
+    expect(esito).toMatchObject({ ok: true, valoreScritto: '629', troncato: true })
+    await expect(page.locator('#quanti')).toHaveValue('629')
+  })
+
+  test('dichiara il fallimento se un numero non c\'è, invece di lasciare il campo vuoto', async ({ page }) => {
+    await page.goto(urlFixture('plain.html'))
+    await iniettaRiempi(page)
+    await page.evaluate(() => {
+      const n = document.createElement('input')
+      n.type = 'number'; n.id = 'quanti'
+      document.getElementById('f')!.append(n)
+    })
+
+    expect(await riempi(page, '#quanti', 'nessun numero qui'))
+      .toMatchObject({ ok: false, motivo: 'il campo accetta solo numeri' })
+  })
+})

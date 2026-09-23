@@ -21,7 +21,7 @@ export function segmenta(testo: string): Frammento[] {
 
     const kv = riga.match(RE_KV)
     if (kv && kv[2]!.trim() && chiavePlausibile(kv[1]!)) {
-      frammenti.push({ etichetta: pulisciEtichetta(kv[1]!), valore: kv[2]!.trim() })
+      frammenti.push(...spezzaCoppieIncatenate(pulisciEtichetta(kv[1]!), kv[2]!.trim()))
       continue
     }
 
@@ -45,6 +45,24 @@ export function segmenta(testo: string): Frammento[] {
   }
 
   return frammenti
+}
+
+/**
+ * Una riga può contenere più coppie incatenate da un trattino:
+ * `Partita IVA: 00885091009 - Codice Fiscale: 00885091009`.
+ *
+ * Si spezza SOLO se dopo il trattino c'è davvero un'altra `Chiave: valore`.
+ * Altrimenti `Indirizzo: VIA PO 20 - 00198 - ROMA (RM)` finirebbe a pezzi, e lì
+ * il trattino è parte del valore.
+ */
+function spezzaCoppieIncatenate(etichetta: string, valore: string): Frammento[] {
+  const taglio = valore.match(/^(.+?)\s+[-–—]\s+([\p{L}][\p{L}\s.'/()-]{0,38}?)\s*:\s*(.+)$/u)
+  if (!taglio || !chiavePlausibile(taglio[2]!)) return [{ etichetta, valore }]
+
+  return [
+    { etichetta, valore: taglio[1]!.trim() },
+    ...spezzaCoppieIncatenate(pulisciEtichetta(taglio[2]!), taglio[3]!.trim()),
+  ]
 }
 
 function chiavePlausibile(k: string): boolean {

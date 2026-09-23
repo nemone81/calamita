@@ -19,6 +19,7 @@ export type MotivoFallimento =
   | 'campo-in-sola-lettura'
   | 'campo-disabilitato'
   | 'nessuna-opzione-corrispondente'
+  | 'il campo accetta solo numeri'
 
 type Riempibile = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
 
@@ -32,6 +33,17 @@ export function riempi(elemento: Element | null, valore: string): EsitoRiempimen
   if ('readOnly' in elemento && elemento.readOnly) return { ok: false, motivo: 'campo-in-sola-lettura' }
 
   if (elemento instanceof HTMLSelectElement) return riempiSelect(elemento, valore)
+
+  // Un <input type="number"> scarta in SILENZIO ciò che non è un numero: il campo
+  // resta vuoto e nessuno protesta. "629 (2026)" diventa 629; se non c'è proprio
+  // un numero, si dichiara il fallimento invece di fingere che sia andata bene.
+  if (elemento instanceof HTMLInputElement && elemento.type === 'number') {
+    const numero = valore.replace(/\./g, '').replace(',', '.').match(/-?\d+(?:\.\d+)?/)?.[0]
+    if (!numero) return { ok: false, motivo: 'il campo accetta solo numeri' }
+    scriviColSetterNativo(elemento, numero)
+    emettiEventi(elemento)
+    return { ok: true, valoreScritto: numero, troncato: numero !== valore.trim() }
+  }
 
   // un `maxlength` è un'informazione, non un ostacolo: il campo CAP che accetta 5
   // caratteri sta dicendo che vuole un CAP
