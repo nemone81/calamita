@@ -57,3 +57,22 @@ textarea {
 .zona { margin-top: 12px; padding: 14px; text-align: center; font-size: 12px; opacity: .55;
   border: 1.5px dashed var(--bordo); border-radius: 8px; }
 .zona.sopra { opacity: 1; border-color: #2563eb; color: #2563eb; }
+
+.grande { font-size: 13px; padding: 5px 14px; font-weight: 600; }
+.proposta { margin: 10px 0; padding: 9px 10px; border-radius: 7px; border: 1px solid #2563eb;
+  background: color-mix(in srgb, #2563eb 8%, transparent); }
+.proposta ul { list-style: none; margin: 0 0 8px; padding: 0;
+  display: flex; flex-direction: column; gap: 3px; max-height: 17em; overflow: auto; }
+.proposta li { display: flex; align-items: baseline; gap: 6px; font-size: 12px; padding: 3px 0; }
+.proposta li.fuori { opacity: .35; text-decoration: line-through; }
+.proposta .val { font-family: ui-monospace, monospace; max-width: 9em;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.proposta .freccia { opacity: .5; }
+.proposta .dest { font-weight: 600; }
+/* sotto la soglia di sicurezza si dice perché, invece di far finta di niente */
+.proposta li.dubbia .perche { color: #b45309; }
+.proposta .perche { opacity: .6; font-size: 11px; margin-left: auto; text-align: right;
+  max-width: 11em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.proposta .tolgi { background: none; border: none; cursor: pointer; color: inherit;
+  opacity: .4; font-size: 14px; line-height: 1; padding: 0 2px; }
+.proposta .tolgi:hover { opacity: 1; }

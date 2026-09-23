@@ -17,8 +17,12 @@ export type Messaggio =
   | { tipo: 'svuota' }
   | { tipo: 'chiedi-anteprima-ai' }
   | { tipo: 'estrai-con-ai'; ingresso: IngressoAI }
+  | { tipo: 'proponi-abbinamenti' }
+  | { tipo: 'applica-abbinamenti'; riempimenti: { indice: number; valore: string }[] }
   // service worker → pagina
   | { tipo: 'riempi-campo-attivo'; valore: string }
+  | { tipo: 'scansiona-campi' }
+  | { tipo: 'riempi-molti'; riempimenti: { indice: number; valore: string }[] }
   // service worker → pannello (broadcast)
   | { tipo: 'stato-cambiato'; stato: Stato }
 
@@ -35,6 +39,14 @@ export type Stato = {
   /** cosa verrà riempito al prossimo clic su una chip; null se nessun campo è stato toccato */
   campoAttivo: string | null
   ultimoEsito: { ok: boolean; testo: string } | null
+}
+
+/** Una proposta di riempimento automatico, da mostrare PRIMA di scrivere qualcosa. */
+export type Proposta = {
+  righe: { slotId: string; etichetta: string; valore: string
+           indice: number; campo: string; motivo: string; punteggio: number }[]
+  /** chip per cui non si è trovato un campo: restano da piazzare a mano */
+  avanzate: { slotId: string; etichetta: string }[]
 }
 
 export const STATO_VUOTO: Stato = { slot: [], campoAttivo: null, ultimoEsito: null }

@@ -26,6 +26,8 @@ export async function inietta(page: Page, modulo: string, globalName: string): P
 
 export const iniettaRiempi = (page: Page) => inietta(page, 'src/fill/riempi.ts', 'Incolla')
 export const iniettaCampoAttivo = (page: Page) => inietta(page, 'src/content/campo-attivo.ts', 'CampoAttivo')
+export const iniettaScansiona = (page: Page) => inietta(page, 'src/content/scansiona.ts', 'Scansiona')
+export const iniettaAbbina = (page: Page) => inietta(page, 'src/mappa/abbina.ts', 'Abbina')
 
 export const urlFixture = (nome: string) =>
   'file://' + path.join(radice, 'tests/fixtures', nome)

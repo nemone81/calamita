@@ -16,6 +16,7 @@
     placeholder="Incolla qui i dati, oppure seleziona il testo in una pagina e premi ⌘⇧Y"></textarea>
 
   <div class="azioni">
+    <button id="riempiTutto" class="primario grande">Riempi il form</button>
     <button id="conAI" class="piatto">Estrai con AI…</button>
     <button id="opzioni" class="piatto" title="Chiavi e provider">Opzioni</button>
   </div>
@@ -28,6 +29,18 @@
     <div class="azioni">
       <button id="vai" class="primario">Manda</button>
       <button id="annulla" class="piatto">Annulla</button>
+    </div>
+  </div>
+
+  <!-- L'anteprima esiste perché su form sempre nuovi l'abbinamento sbaglierà
+       ogni tanto: l'errore si deve vedere PRIMA, non dopo. -->
+  <div id="proposta" class="proposta" hidden>
+    <p class="che"><b id="quanti"></b></p>
+    <ul id="righe"></ul>
+    <p id="avanzate" class="nota" hidden></p>
+    <div class="azioni">
+      <button id="applica" class="primario">Riempi</button>
+      <button id="scarta" class="piatto">Annulla</button>
     </div>
   </div>
 

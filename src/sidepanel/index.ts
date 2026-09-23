@@ -1,4 +1,4 @@
-import { STATO_VUOTO, type AnteprimaAI, type IngressoAI, type Messaggio, type Stato } from '../shared/messaggi.js'
+import { STATO_VUOTO, type AnteprimaAI, type IngressoAI, type Messaggio, type Proposta, type Stato } from '../shared/messaggi.js'
 import type { Slot } from '../shared/tipi.js'
 
 const el = {
@@ -17,6 +17,13 @@ const el = {
   vai: document.getElementById('vai') as HTMLButtonElement,
   annulla: document.getElementById('annulla') as HTMLButtonElement,
   zona: document.getElementById('zona') as HTMLDivElement,
+  riempiTutto: document.getElementById('riempiTutto') as HTMLButtonElement,
+  proposta: document.getElementById('proposta') as HTMLDivElement,
+  quanti: document.getElementById('quanti') as HTMLElement,
+  righe: document.getElementById('righe') as HTMLUListElement,
+  avanzate: document.getElementById('avanzate') as HTMLParagraphElement,
+  applica: document.getElementById('applica') as HTMLButtonElement,
+  scarta: document.getElementById('scarta') as HTMLButtonElement,
 }
 
 let stato: Stato = STATO_VUOTO
@@ -98,7 +105,9 @@ async function aggiorna(s: Slot, campi: { etichetta?: string; valore?: string })
 el.incollaQui.addEventListener('paste', (e) => {
   const testo = e.clipboardData?.getData('text') ?? ''
   if (!testo.trim()) return
-  e.preventDefault()
+  // NON si chiama preventDefault: il testo deve restare nella textarea, perché
+  // «Estrai con AI» legge da lì. Prima era il contrario e quel bottone non aveva
+  // mai niente da mandare.
   manda({ tipo: 'aggiungi-testo', testo }).then((s) => { stato = s; disegna() })
 })
 
@@ -110,6 +119,87 @@ chrome.runtime.onMessage.addListener((m: Messaggio) => {
 })
 
 manda({ tipo: 'leggi-stato' }).then((s) => { stato = s; disegna() })
+
+// ---------- riempimento automatico, sempre preceduto da un'anteprima ----------
+
+/** Sotto questa soglia la riga si segnala in arancione: l'abbinamento è un'ipotesi. */
+const SOGLIA_DUBBIA = 0.8
+
+let proposta: Proposta | null = null
+const escluse = new Set<string>()
+
+el.riempiTutto.addEventListener('click', async () => {
+  el.riempiTutto.disabled = true
+  proposta = await (chrome.runtime.sendMessage({ tipo: 'proponi-abbinamenti' }) as Promise<Proposta>)
+  el.riempiTutto.disabled = false
+  escluse.clear()
+
+  if (!proposta?.righe.length) {
+    stato = { ...stato, ultimoEsito: { ok: false, testo:
+      stato.slot.length ? 'nessun campo abbinabile in questa pagina' : 'prima servono delle chip' } }
+    disegna()
+    return
+  }
+  disegnaProposta()
+})
+
+function disegnaProposta() {
+  if (!proposta) return
+  const attive = proposta.righe.filter((r) => !escluse.has(r.slotId))
+  el.quanti.textContent = attive.length === 1
+    ? 'Un campo da riempire:'
+    : `${attive.length} campi da riempire:`
+
+  el.righe.replaceChildren(...proposta.righe.map((r) => {
+    const li = document.createElement('li')
+    if (escluse.has(r.slotId)) li.classList.add('fuori')
+    if (r.punteggio < SOGLIA_DUBBIA) li.classList.add('dubbia')
+
+    const val = document.createElement('span')
+    val.className = 'val'; val.textContent = r.valore; val.title = `${r.etichetta}: ${r.valore}`
+
+    const fr = document.createElement('span'); fr.className = 'freccia'; fr.textContent = '→'
+
+    const dest = document.createElement('span')
+    dest.className = 'dest'; dest.textContent = r.campo
+
+    const perche = document.createElement('span')
+    perche.className = 'perche'; perche.textContent = r.motivo; perche.title = r.motivo
+
+    const tolgi = document.createElement('button')
+    tolgi.className = 'tolgi'; tolgi.textContent = escluse.has(r.slotId) ? '+' : '×'
+    tolgi.title = escluse.has(r.slotId) ? 'rimetti' : 'togli questa riga'
+    tolgi.addEventListener('click', () => {
+      escluse.has(r.slotId) ? escluse.delete(r.slotId) : escluse.add(r.slotId)
+      disegnaProposta()
+    })
+
+    li.append(val, fr, dest, perche, tolgi)
+    return li
+  }))
+
+  // le chip senza un campo restano da piazzare a mano: meglio dirlo che tacerlo
+  el.avanzate.hidden = !proposta.avanzate.length
+  el.avanzate.textContent = proposta.avanzate.length
+    ? `Senza un campo: ${proposta.avanzate.map((a) => a.etichetta).join(', ')}. Restano da mettere a mano.`
+    : ''
+
+  el.applica.disabled = attive.length === 0
+  el.proposta.hidden = false
+}
+
+el.applica.addEventListener('click', async () => {
+  if (!proposta) return
+  const riempimenti = proposta.righe
+    .filter((r) => !escluse.has(r.slotId))
+    .map((r) => ({ indice: r.indice, valore: r.valore }))
+  el.proposta.hidden = true
+  proposta = null
+  stato = await manda({ tipo: 'applica-abbinamenti', riempimenti })
+  disegna()
+})
+
+el.scarta.addEventListener('click', () => { proposta = null; el.proposta.hidden = true })
 
 // ---------- T14 + T15: estrazione con AI, sempre preceduta da una conferma ----------
 
